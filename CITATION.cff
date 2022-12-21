@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Bohyn"
+  given-names: "Alexandre"
+  orcid: "https://orcid.org/0000-0001-9776-7467"
+- family-names: "Schoen"
+  given-names: "Eric"
+  orcid: "https://orcid.org/0000-0002-4431-6117"
+- family-names: "Goos"
+  given-names: "Peter"
+  orcid: "https://orcid.org/0000-0002-3854-6506"
+title: "microplate_assays"
+version: 1.0.0
+doi: 10.5281/zenodo.1234
+date-released: 2022-12-21
+url: "https://github.com/ABohynDOE/microplate_assays"
