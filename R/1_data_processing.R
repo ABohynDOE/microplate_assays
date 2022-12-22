@@ -3,6 +3,7 @@
 library(tidyverse)
 # Load latest version (3) of the data set
 raw_data <- readxl::read_xlsx("raw-data/Mimetas 8 factors masterfile v3E.xlsx")
+chee_design <- readxl::read_xlsx("raw-data/design_chee_version.xlsx", sheet = 2)
 # Rename data using letter code
 full_data <- raw_data %>%
   select(
@@ -33,9 +34,9 @@ full_data <- raw_data %>%
   # Recode all variables in -1/+1 fashion
   mutate(
     # Plate number extracted from ID
-    plate = as.numeric(str_extract(plate,'\\d$')),
+    plate = as.numeric(str_extract(plate, "\\d$")),
     row = str_extract(chip, "\\w"),
-    teer = as.numeric(gsub("No Fit",NA,teer)),
+    teer = as.numeric(gsub("No Fit", NA, teer)),
     h = recode(h, `1` = -1, `60` = 1),
     a = as.numeric(recode(a, "Early" = -1, "Late" = 1)),
     b = recode(b, `100` = -1, `300` = 1),
@@ -47,20 +48,39 @@ full_data <- raw_data %>%
     # Flag problematic cells
     problem = (bubbles | insufficient.filling),
     # Mutiply fibrosity by 1000
-    fibrosity = fibrosity*1000
+    fibrosity = fibrosity * 1000
   ) %>%
-  relocate(row, .after=plate)
-  
-# Only fibrosity in the data
-fibrosity <- full_data %>%
-  select(-starts_with('insufficient'), -bubbles, -dead.cells, 
-         -invasion.score, -teer, -fibrous)
-  
+  relocate(row, .after = plate)
+
+# Only fibrosity in the data and create a code to identify each row uniquely
+fibrosity_no_tube <- full_data %>%
+  select(
+    -starts_with("insufficient"), -bubbles, -dead.cells,
+    -invasion.score, -teer, -fibrous
+  ) %>%
+  unite("id", g, h, a, b, c, d, e, f, sep = ".", remove = FALSE)
+
+# Join the tube numbers from Chee's version of the design
+tube_subdesign <- chee_design %>%
+  unite("id", Start:H_rmv, sep = ".", remove = TRUE) %>%
+  mutate(tube = (Week - 1) * 8 + Tube) %>%
+  select(id, tube)
+
+fibrosity <- fibrosity_no_tube %>%
+  left_join(tube_subdesign, by = "id") %>%
+  select(-id) %>%
+  relocate(tube, .after = plate)
+
+# Save the dataset as rda file
+save(fibrosity, file = "data/fibrosity.rda")
+
 # Only the problematic cells and their location
 problematic_chips <- full_data %>%
-  select(week, plate, row, column, starts_with('insufficient'), bubbles, 
-         dead.cells)
+  select(
+    week, plate, row, column, starts_with("insufficient"), bubbles,
+    dead.cells
+  )
+
 
 # Save the dataset as rda
 save(problematic_chips, file = "data/problematic_chips.rda")
-save(fibrosity, file = "data/fibrosity.rda")
