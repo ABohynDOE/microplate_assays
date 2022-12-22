@@ -5,7 +5,5 @@ authors:
   given-names: "Alexandre"
   orcid: "https://orcid.org/0000-0001-9776-7467"
 title: "microplate_assays"
-version: 1.0.0
-doi: 10.5281/zenodo.1234
 date-released: 2022-12-21
 url: "https://github.com/ABohynDOE/microplate_assays"
