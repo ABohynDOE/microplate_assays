@@ -56,23 +56,70 @@ full_data <- raw_data %>%
 fibrosity_no_tube <- full_data %>%
   select(
     -starts_with("insufficient"), -bubbles, -dead.cells,
-    -invasion.score, -teer, -fibrous
-  ) %>%
-  unite("id", g, h, a, b, c, d, e, f, sep = ".", remove = FALSE)
+    -invasion.score, -teer, -fibrous, -chip
+  )
 
-# Join the tube numbers from Chee's version of the design
-tube_subdesign <- chee_design %>%
-  unite("id", Start:H_rmv, sep = ".", remove = TRUE) %>%
-  mutate(tube = (Week - 1) * 8 + Tube) %>%
-  select(id, tube)
-
+# Add the tube numbers based on the relation table from the paper
 fibrosity <- fibrosity_no_tube %>%
-  left_join(tube_subdesign, by = "id") %>%
-  select(-id) %>%
-  relocate(tube, .after = plate)
+  mutate(
+    week = ifelse(h == -1, 1, 2),
+    plate = (week - 1) * 2 + ifelse(g == -1, 1, 2),
+    tube = 8 * (week - 1) + (a + 1) * 2 + (b + 1) + (d + 1) / 2 + 1
+  ) %>%
+  relocate(tube, .after = plate) %>%
+  relocate(g, h, .after = f) %>%
+  relocate(d, .after = c) %>%
+  arrange(week, plate, column, row)
 
-# Save the dataset as rda file
+# Save the data set as rda file
 save(fibrosity, file = "data/fibrosity.rda")
+
+# Export the fibrosity data set to csv for supplementary materials of the paper
+write_csv2(fibrosity, file = "output/tables/data_table.csv")
+
+# Generate the design for the latex table for the paper
+tex_table <- fibrosity %>%
+  select(week, plate, column, tube, a:h) %>%
+  mutate(across(.cols = a:h, .fns = ~ recode(.x, `-1` = "-", `1` = "+"))) %>%
+  unique() %>%
+  arrange(week, plate, column) %>%
+  mutate(
+    column = recode(column,
+      `2` = 1,
+      `5` = 2,
+      `8` = 3,
+      `11` = 4,
+      `14` = 5,
+      `17` = 6,
+      `20` = 7,
+      `23` = 8
+    )
+  ) %>%
+  rename_with(~ paste('$\\mathbf{',.x,'}$')) %>%
+  rename(
+    Week = '$\\mathbf{ week }$',
+    Plate = '$\\mathbf{ plate }$',
+    Tube = '$\\mathbf{ tube }$',
+    Column = '$\\mathbf{ column }$'
+  ) %>%  
+  xtable::xtable(
+    align = rep('c', 13),
+    caption = "Final experimental design, along with the corresponding week, plate, tube, and column for each experimental run.",
+    label = "tab:full_design_table",
+    digits = rep(0, 13)
+  )
+
+# Export to latex format in the latex folder of output
+tex_table %>%
+  print(
+    file = "output/tex/full_design.tex",
+    booktabs = TRUE,
+    table.placement = "hbtp",
+    caption.placement = "top",
+    include.rownames = FALSE,
+    sanitize.text.function=function(x){x}
+    )
+
 
 # Only the problematic cells and their location
 problematic_chips <- full_data %>%
@@ -80,7 +127,6 @@ problematic_chips <- full_data %>%
     week, plate, row, column, starts_with("insufficient"), bubbles,
     dead.cells
   )
-
 
 # Save the dataset as rda
 save(problematic_chips, file = "data/problematic_chips.rda")
