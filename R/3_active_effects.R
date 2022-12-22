@@ -1,6 +1,6 @@
 #' Compute the effect size for the 31 factorial effects, along with robust
 #' standard error estimate to identify the active effects in each stratum.
-#' Save the active effects to and .rda data set and plot a dotplot of all the 
+#' Save the active effects to and .rda data set and plot a dotplot of all the
 #' effects.
 
 library(tidyverse)
@@ -62,7 +62,7 @@ pse <- model %>%
     kept_values = ifelse(abs_size > s_ini, NA, abs_size),
     # Compute median of the retained values
     med = quantile(kept_values, 0.5, na.rm = T),
-    # Final estimate of S.E. based on median of remaining contrasts and 
+    # Final estimate of S.E. based on median of remaining contrasts and
     # consistency constant
     se = 1.484 * med,
     # Define consistency constant based on the number of contrasts (see paper

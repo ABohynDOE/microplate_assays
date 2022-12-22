@@ -5,8 +5,8 @@ position_data <- readxl::read_excel("raw-data/fibrosity_position.xlsx")
 position_data <- position_data %>%
   group_by(position) %>%
   mutate(
-    error.ymin = mean(size) - error/2,
-    error.ymax = mean(size) + error/2
+    error.ymin = mean(size) - error / 2,
+    error.ymax = mean(size) + error / 2
   )
 # Unique position
 unique_pos <- unique(position_data$position)
@@ -36,16 +36,16 @@ for (pos in unique_pos) {
     # Add the error bar
     geom_errorbar(
       aes(
-        x = 0.675, 
-        ymin = error.ymin, 
+        x = 0.675,
+        ymin = error.ymin,
         ymax = error.ymax
       ),
       width = 0.2
     ) +
     ylim(min(position_data$size), max(position_data$size)) +
-    theme_bw()+
+    theme_bw() +
     theme(panel.grid = element_blank())
-  # Save the plot 
+  # Save the plot
   ggsave(
     filename = sprintf("output/figures/%s_effect.pdf", pos),
     plot = p,
@@ -54,7 +54,7 @@ for (pos in unique_pos) {
   )
   # Store the plot inside the list
   plot.list[[index]] <- p
-  index = index + 1
+  index <- index + 1
 }
 
 # Combine the plots

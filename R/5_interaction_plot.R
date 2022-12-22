@@ -15,7 +15,7 @@ lsd_data <- readxl::read_excel(
   # Average per interaction
   group_by(interaction_label) %>%
   summarise(mean.error = mean(value)) %>%
-  # gh is not estimable so we remove the LSD data 
+  # gh is not estimable so we remove the LSD data
   mutate(mean.error = ifelse(interaction_label == "hg", NA, mean.error))
 
 # Combined dataset
@@ -26,14 +26,13 @@ combined_data <- interaction_data %>%
   group_by(interaction_label) %>%
   mutate(
     error.y = mean(value),
-    error.ymin = error.y - mean.error/2,
-    error.ymax = error.y + mean.error/2
+    error.ymin = error.y - mean.error / 2,
+    error.ymax = error.y + mean.error / 2
   )
 
 # Function to use full label names instead of letters
-fix_labels <- function(x){
-  switch(
-    x,
+fix_labels <- function(x) {
+  switch(x,
     "a" = "Aliquot",
     "c" = "Amount of mixing",
     "d" = "pH",
@@ -42,9 +41,8 @@ fix_labels <- function(x){
   )
 }
 
-fix_levels <- function(level, factor){
-  out <- switch(
-    factor,
+fix_levels <- function(level, factor) {
+  out <- switch(factor,
     "a" = ifelse(level == "Low", "Early", "Late"),
     "c" = ifelse(level == "Low", "20", "50"),
     "d" = ifelse(level == "Low", "7.1", "8.3"),
@@ -61,15 +59,15 @@ interaction_labels <- unique(lsd_data$interaction_label)
 plot.list <- list()
 index <- 1
 for (label in interaction_labels) {
-  label1 <- substr(label,1,1)
-  label2 <- substr(label,2,2)
+  label1 <- substr(label, 1, 1)
+  label2 <- substr(label, 2, 2)
   p <- combined_data %>%
     filter(interaction_label == label) %>%
     ggplot(
       aes(x = factor1_level, y = value, group = factor2_level)
     ) +
     # Point and line with type and shape specific to factor 2
-    geom_point(aes(shape = factor2_level)) + 
+    geom_point(aes(shape = factor2_level)) +
     geom_line(aes(lty = factor2_level)) +
     # Single average error bar for the whole plot
     geom_errorbar(aes(
@@ -78,11 +76,12 @@ for (label in interaction_labels) {
       ymin = error.ymin,
       ymax = error.ymax
     ),
-    width = 0.15) + 
+    width = 0.15
+    ) +
     # Re-order the labels in the x axis
     scale_x_discrete(
       name = fix_labels(label1),
-      limits = c('Low', 'High'),
+      limits = c("Low", "High"),
       labels = c(fix_levels("Low", label1), fix_levels("High", label1))
     ) +
     scale_y_continuous(
@@ -97,15 +96,15 @@ for (label in interaction_labels) {
     # Reordering of the items in the legend
     scale_linetype_discrete(
       name = fix_labels(label2),
-      limits = c('Low', 'High'),
+      limits = c("Low", "High"),
       labels = c(fix_levels("Low", label2), fix_levels("High", label2))
     ) +
     # Reorder both legend part to combine them
     scale_shape_discrete(
       name = fix_labels(label2),
-      limits = c('Low', 'High'),
+      limits = c("Low", "High"),
       labels = c(fix_levels("Low", label2), fix_levels("High", label2))
-    ) + 
+    ) +
     # Vertical box for interaction plot
     theme_bw() +
     theme(
@@ -122,7 +121,7 @@ for (label in interaction_labels) {
   )
   # Store the plot inside the list
   plot.list[[index]] <- p
-  index = index + 1
+  index <- index + 1
 }
 
 # Combine the plots
