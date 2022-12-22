@@ -31,7 +31,7 @@ for (pos in unique_pos) {
     geom_line() +
     labs(
       x = str_to_title(pos),
-      y = "Firbosity"
+      y = "Fibrosity"
     ) +
     # Add the error bar
     geom_errorbar(
