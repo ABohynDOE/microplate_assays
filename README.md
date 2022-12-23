@@ -16,6 +16,8 @@ Code for the analysis of the 2023 paper **"Design and analysis of a microplate a
 
 -   `5_interaction_plot.R`: Generate the interaction plots for the three two-factor interaction that are active in the final model. All three plots are saved in the `output/` folder.
 
+- `alternative_scenarios.R`: Generate the design files for the 3 alternative scenarios mentionned in the paper.
+
 ### Python scripts
 
 #### Design generation
