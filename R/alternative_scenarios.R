@@ -51,7 +51,7 @@ alias_to_tube <- function(data, alias) {
 
 
 # First delete all previous occurence of the designs
-unlink("output/tables/alternative_scenario_*.xlsx")
+# unlink("output/tables/alternative_scenario_*.xlsx")
 
 # We want to gather the experiment structure for all experiments
 exp_structure <- data.frame()
