@@ -121,3 +121,21 @@ writexl::write_xlsx(
   exp_structure,
   path = paste0("output/tables/alternative_scenarios_structure.xlsx")
 )
+
+# Summarize the characteristics of the base scenario and the four alternative
+# scenarios and export it to a readable table
+summary <- scenarios_infos %>%
+  bind_rows(
+    filter(scenarios_infos, number == 1) %>%
+      mutate(number = 0, tube = "abd", name = "base_scenario")
+  ) %>%
+  arrange(number) %>%
+  column_to_rownames("name") %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column("factor")
+
+writexl::write_xlsx(
+  summary,
+  path = paste0("output/tables/alternative_scenarios_summary.xlsx"),
+)
