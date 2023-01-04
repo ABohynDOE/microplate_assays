@@ -12,17 +12,17 @@ basic_design <- tibble::as.tibble(basic_design)
 
 # Gather information about the alternative scenarios in a tibble
 scenarios_infos <- tibble::tibble(
-  name = c("32_tubes", "no_restrictions", "four_level_blocking"),
-  number = c(1, 2, 3),
-  f = c("abcde", "abcd", "abcde"),
-  g = c("ace", "abe", "abe"),
-  h = c("abc", "ace", "abc"),
-  week = c("ace", "abd", "abc"),
-  plate = c("abc", "ade", "abe"),
-  p1 = c("ab", "abc", "ab"),
-  p2 = c("ce", "ad", "acd"),
-  p3 = c("acd", "ae", NA),
-  tube = c("abd", "abc", "abd")
+  name = c("2tubes_plate", "32_tubes", "no_restrictions", "four_level_blocking"),
+  number = c(1, 2, 3, 4),
+  f = c("abcde", "abcde", "abcd", "abcde"),
+  g = c("ace", "ace", "abe", "abe"),
+  h = c("abc", "abc", "ace", "abc"),
+  week = c("ace", "ace", "abd", "abc"),
+  plate = c("abc", "abc", "ade", "abe"),
+  p1 = c("ab", "ab", "abc", "ab"),
+  p2 = c("ce", "ce", "ad", "acd"),
+  p3 = c("acd", "acd", "ae", NA),
+  tube = c("abe", "abd", "abc", "abd")
 )
 
 # List of variables to create
@@ -49,21 +49,32 @@ alias_to_tube <- function(data, alias) {
   return(final[, 1])
 }
 
-# Case of the first scenario
-for (i in 1:3) {
+
+# First delete all previous occurence of the designs
+unlink("output/tables/alternative_scenario_*.xlsx")
+
+# We want to gather the experiment structure for all experiments
+exp_structure <- data.frame()
+
+# Create the design for each case
+for (i in 1:4) {
   # Isolate info on that design
   info <- scenarios_infos %>%
     filter(number == i)
+  
   # Base design
   df <- basic_design
+  
   # Generate all added factors
   for (var_name in vars) {
-    if (i == 3 && var_name == "p3") {
+    if (info$name == "four_level_blocking" && var_name == "p3") {
       next
+    } else {
+      df <- df %>%
+        mutate({{ var_name }} := alias_to_factor(df, info[[var_name]]))
     }
-    df <- df %>%
-      mutate({{ var_name }} := alias_to_factor(df, info[[var_name]]))
   }
+  
   # Generate the tube numbers
   df <- df %>%
     mutate(
@@ -74,22 +85,39 @@ for (i in 1:3) {
       tube = week_base + tube_base,
       .keep = "unused"
     )
+  
   # Reformat the week and plate, define the column positions
   df <- df %>%
     mutate(
       week = (week + 1) / 2 + 1,
       plate = 2 * (week - 1) + (plate + 1) / 2 + 1
     )
-  if (i == 3) {
+  if (info$name == "four_level_blocking") {
     df <- df %>%
       mutate(column = (p1 + 1) + (p2 + 1) / 2 + 1, .keep = "unused")
   } else {
     df <- df %>%
       mutate(column = 2 * (p1 + 1) + (p2 + 1) + (p3 + 1) / 2 + 1, .keep = "unused")
   }
+  
+  # Summarize the design to show the experiment structure like Figure 2 in the 
+  # paper
+  local_exp_structure <- df %>%
+    group_by(week, plate, tube) %>% 
+    summarise(n  = n(), .groups = "drop") %>% 
+    pivot_wider(names_from = tube, values_from = n, values_fill = NA) %>%
+    mutate(scenario = i, .before = week)
+  exp_structure <- rbind(exp_structure, local_exp_structure)
+  
   # Export to csv file
   writexl::write_xlsx(
     df,
-    path = paste0("output/tables/alternative_scenario_", i, ".xlsx")
+    path = paste0("output/tables/alternative_scenario_", i, "_design.xlsx")
   )
 }
+
+# Export all the experiment structure to a csv file
+writexl::write_xlsx(
+  exp_structure,
+  path = paste0("output/tables/alternative_scenarios_structure.xlsx")
+)
