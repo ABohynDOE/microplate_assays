@@ -44,9 +44,9 @@ alias_to_tube <- function(data, alias) {
   sub_data <- data %>%
     select(all_of(vars))
   sub_data_mat <- as.matrix((sub_data + 1) / 2)
-  num_mat <- 2**seq(dim(sub_data_mat)[2]-1,0)
+  num_mat <- 2**seq(dim(sub_data_mat)[2] - 1, 0)
   final <- (sub_data_mat %*% num_mat) + 1
-  return(final[,1])
+  return(final[, 1])
 }
 
 # Case of the first scenario
@@ -64,11 +64,12 @@ for (i in 1:3) {
     df <- df %>%
       mutate({{ var_name }} := alias_to_factor(df, info[[var_name]]))
   }
-  # Generate the tube numbers 
-  df <- df %>% 
+  # Generate the tube numbers
+  df <- df %>%
     mutate(
-      week_base = 4*(week + 1),
-      tube_base = alias_to_tube(df, info[["tube"]])) %>%
+      week_base = 4 * (week + 1),
+      tube_base = alias_to_tube(df, info[["tube"]])
+    ) %>%
     mutate(
       tube = week_base + tube_base,
       .keep = "unused"
