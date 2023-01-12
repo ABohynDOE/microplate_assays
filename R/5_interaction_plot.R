@@ -36,7 +36,7 @@ fix_labels <- function(x) {
     "a" = "Aliquot",
     "c" = "Amount of mixing",
     "d" = "pH",
-    "g" = "Starting\ntime (min)",
+    "g" = "Starting time (min)",
     "h" = "Time on ice (min)"
   )
 }
@@ -97,18 +97,21 @@ for (label in interaction_labels) {
     scale_linetype_discrete(
       name = fix_labels(label2),
       limits = c("Low", "High"),
-      labels = c(fix_levels("Low", label2), fix_levels("High", label2))
+      labels = c(fix_levels("Low", label2), fix_levels("High", label2)),
+      guide = guide_legend(title.position = "top")
     ) +
     # Reorder both legend part to combine them
     scale_shape_discrete(
       name = fix_labels(label2),
       limits = c("Low", "High"),
-      labels = c(fix_levels("Low", label2), fix_levels("High", label2))
+      labels = c(fix_levels("Low", label2), fix_levels("High", label2)),
+      guide = guide_legend(title.position = "top")
     ) +
     # Vertical box for interaction plot
-    theme_bw() +
+    theme_bw(base_size = 15) +
     theme(
-      axis.text = element_text(size = 12),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 12),
       legend.position = "top",
       panel.grid = element_blank()
     )
