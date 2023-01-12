@@ -1,6 +1,8 @@
 library(tidyverse)
+
 # Load the position effects
 position_data <- readxl::read_excel("raw-data/fibrosity_position.xlsx")
+
 # Compute error position
 position_data <- position_data %>%
   group_by(position) %>%
@@ -8,10 +10,38 @@ position_data <- position_data %>%
     error.ymin = mean(size) - error / 2,
     error.ymax = mean(size) + error / 2
   )
+
+# Rename row and column using 1 to 8 
+row_label <- position_data %>% 
+  filter(position == "row") %>% 
+  pull(label) %>% 
+  unique() %>% 
+  sort() %>%
+  as.character()
+
+col_label <- position_data %>% 
+  filter(position == "column") %>% 
+  pull(label) %>% 
+  as.integer() %>%
+  unique() %>% 
+  sort()
+
+position_data <- position_data %>%
+  mutate(
+    label_base = label, 
+    label = ifelse(
+      position == "row",
+      match(label_base, row_label),
+      match(label_base, col_label)
+      ),
+    label = as.factor(label)
+    )
+
 # Unique position
 unique_pos <- unique(position_data$position)
 plot.list <- list()
 index <- 1
+
 # Plot the effects
 for (pos in unique_pos) {
   # Actual plot of the data
