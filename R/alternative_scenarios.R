@@ -12,15 +12,15 @@ for (i in 1:5) {
   )
 }
 colnames(basic_design) <- letters[1:5]
-basic_design <- tibble::as.tibble(basic_design)
+basic_design <- tibble::as_tibble(basic_design)
 
 # Gather information about the alternative scenarios in a tibble
 scenarios_infos <- tibble::tibble(
   name = c(
-    "2tubes_plate",
-    "32_tubes",
-    "no_restrictions",
-    "four_level_blocking"
+    "scenario1_2tubes_plate",
+    "scenario2_32_tubes",
+    "scenario3_no_restrictions",
+    "scenario4_four_level_blocking"
   ),
   number = c(1, 2, 3, 4),
   f = c("abcde", "abcde", "abcd", "abcde"),
@@ -61,6 +61,7 @@ alias_to_tube <- function(data, alias) {
 
 # We want to gather the experiment structure for all experiments
 exp_structure <- data.frame()
+list_of_scenarios <- list()
 
 # Create the design for each case
 for (i in 1:4) {
@@ -73,7 +74,7 @@ for (i in 1:4) {
 
   # Generate all added factors
   for (var_name in vars) {
-    if (info$name == "four_level_blocking" && var_name == "p3") {
+    if (info$name == "scenario4_four_level_blocking" && var_name == "p3") {
       next
     } else {
       df <- df %>%
@@ -98,7 +99,7 @@ for (i in 1:4) {
       week = (week + 1) / 2 + 1,
       plate = 2 * (week - 1) + (plate + 1) / 2 + 1
     )
-  if (info$name == "four_level_blocking") {
+  if (info$name == "scenario4_four_level_blocking") {
     df <- df %>%
       mutate(column = (p1 + 1) + (p2 + 1) / 2 + 1, .keep = "unused")
   } else {
@@ -114,16 +115,26 @@ for (i in 1:4) {
   local_exp_structure <- df %>%
     group_by(week, plate, tube) %>%
     summarise(n = n(), .groups = "drop") %>%
-    pivot_wider(names_from = tube, values_from = n, values_fill = NA) %>%
+    tidyr::pivot_wider(names_from = tube, values_from = n, values_fill = NA) %>%
     mutate(scenario = i, .before = week)
   exp_structure <- rbind(exp_structure, local_exp_structure)
-
+  
+  # Add to list of scenarios
+  list_of_scenarios[[info$name]] <- df
+  
   # Export to csv file
   writexl::write_xlsx(
     df,
     path = paste0("output/tables/alternative_scenario_", i, "_design.xlsx")
   )
 }
+
+# Write the list of scenarios to excel
+openxlsx::write.xlsx(
+  list_of_scenarios, 
+  file = "output/tables/alternative_scenarios.xlsx"
+)
+
 
 # Export all the experiment structure to a csv file
 writexl::write_xlsx(
