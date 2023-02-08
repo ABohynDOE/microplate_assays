@@ -8,7 +8,7 @@ Code for the analysis of the 2023 paper **"Design and analysis of a microplate a
 
 - `1_data_processing.R`: Read the raw data provided by Mimetas, tidy it and save it as `data/fibrosity.rda`.
 
-- `2_error_structure.R`: Read the excel file containing the error structure of the experiment and save it as `data/fibrosity_error.rda`.
+- `2_error_structure.R`: Read the excel file containing the error structure of the experiment and save it as `data/fibrosity_error.rda`. Also exports the data table as `output/data_table.csv` for the additional material of the paper.
 
 - `3_active_effects.R`: Run the full linear model with 31 terms, corresponding to the 31 estimable factorial effects, and compute a robust estimate of the standard error in each error stratum. For each stratum, define the active effects based on the PSE(50) critical value at 10%, computed from the robust standard error estimate. Save the effect sizes, thresholds, and robust error estimates as `data/active_effects.rda`.
 
