@@ -1,6 +1,6 @@
 # Microplate assays analysis
 
-Code for the analysis of the 2023 paper **"Design and analysis of a microplate assay in the presence of multiple restrictions in the randomization"**
+Code for the analysis of our paper [**"Design and analysis of a microplate assay in the presence of multiple restrictions in the randomization"**](https://arxiv.org/abs/2303.05817)
 
 ## Code files
 
