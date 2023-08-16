@@ -1,0 +1,8 @@
+import 'data.xlsx'; isave=pnt
+
+calc fibrosity=1000*fibrosity
+groups [rede=yes] week,plate,tube,row,column
+point [val=pnt[7...14]] facs
+
+vcomp [fixed=time_on_ice*start_time+aliquot+mixing*ph+aliquot.time_on_ice+row+column] week.tube+week.plate.row+week.plate.column; constr=pos
+reml   fibrosity

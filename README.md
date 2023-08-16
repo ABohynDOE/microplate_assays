@@ -18,6 +18,11 @@ Code for the analysis of our paper [**"Design and analysis of a microplate assay
 
 - `alternative_scenarios.R`: Generate the design files for the 4 alternative scenarios mentioned in the paper. They are stored in the `ouput/tables/` folder and named `alternative_scenario_*_designs.xlsx`. Also generate a table summarizing the structure of the experiment under each scenario (similar to Figure 2 in the paper), saved as `output/tables/alternative_scenarios_structure.xlsx`. Finally, create a table with the words used for the weeks, plates, tubes and column positions, for the four scenarios, saved as `output/tables/alternative_scenarios_summary.xlsx`.
 
+### Genstat scripts
+
+The only genstat script is the file `genstat/fibrosity_mixed_model.gen` that runs the mixed model presented in the paper on the full data set.
+In case you are unable to run genstat, the file can be opened with a text editor, and the output of the script is given in `output/output_fibrosity_mixed_model.rtf`.
+
 ### Python scripts
 
 #### Design generation
