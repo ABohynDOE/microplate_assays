@@ -1,6 +1,6 @@
 # Microplate assays analysis
 
-Code for the analysis of our paper [**"Design and analysis of a microplate assay in the presence of multiple restrictions in the randomization"**](https://arxiv.org/abs/2303.05817)
+Code for the analysis of our paper [**"Design and analysis of a microplate assay in the presence of multiple restrictions in the randomization"**]([https://arxiv.org/abs/2303.05817](https://link.springer.com/article/10.1007/s13253-023-00570-1))
 
 ## Code files
 
